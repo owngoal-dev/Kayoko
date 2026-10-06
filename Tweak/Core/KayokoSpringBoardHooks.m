@@ -101,10 +101,8 @@ typedef void (^FBSceneUpdateCompletion)(void);
 @end
 
 static const NSInteger kKayokoSystemGestureTypeCoverSheet = 0x1;
-static const NSInteger kKayokoSystemGestureTypeMultitaskingA = 0x29;
-static const NSInteger kKayokoSystemGestureTypeMultitaskingB = 0x2B;
-static const NSInteger kKayokoSystemGestureTypeMultitaskingC = 0x2D;
-static const NSInteger kKayokoSystemGestureTypeControlCenter = 0x6;
+static NSInteger kayokoSystemGestureTypeMultitasking;
+static NSInteger kayokoSystemGestureTypeControlCenter;
 
 static CGFloat const kKayokoSystemKeyboardFrameEdgeTolerance = 1.0;
 static NSString *const kKayokoExternalKeyboardDiscoverabilityTitle = @"Kayoko";
@@ -394,13 +392,11 @@ CHOptimizedMethod1(self, void, SBApplicationController, applicationsUpdated, id,
 
 CHOptimizedMethod1(self, BOOL, SBMainDisplaySystemGestureManager, _isGestureWithTypeAllowed, NSInteger, type) {
     KayokoCoreRuntime *runtime = [KayokoCoreRuntime sharedRuntime];
-    if ((type == kKayokoSystemGestureTypeCoverSheet || type == kKayokoSystemGestureTypeControlCenter) &&
+    if ((type == kKayokoSystemGestureTypeCoverSheet || type == kayokoSystemGestureTypeControlCenter) &&
         [runtime fullscreenSearchActive]) {
         return NO;
     }
-    if ((type == kKayokoSystemGestureTypeMultitaskingA || type == kKayokoSystemGestureTypeMultitaskingB ||
-         type == kKayokoSystemGestureTypeMultitaskingC) &&
-        [runtime systemMultitaskingGestureSuppressed]) {
+    if (type == kayokoSystemGestureTypeMultitasking && [runtime systemMultitaskingGestureSuppressed]) {
         return NO;
     }
 
@@ -685,6 +681,30 @@ CHOptimizedMethod3(self, void, FBScene, updateSettings, UIApplicationSceneSettin
 }
 
 + (void)installSystemGestureHooks {
+    // Per-major mappings sampled from dyld caches: docs/system-gesture-types.md.
+    NSInteger majorVersion = [[NSProcessInfo processInfo] operatingSystemVersion].majorVersion;
+    switch (majorVersion) {
+    case 14:
+        kayokoSystemGestureTypeMultitasking = 0x20;
+        break;
+    case 15:
+        kayokoSystemGestureTypeMultitasking = 0x29;
+        break;
+    case 16:
+        kayokoSystemGestureTypeMultitasking = 0x2B;
+        break;
+    case 17:
+    case 18:
+        kayokoSystemGestureTypeMultitasking = 0x2D;
+        break;
+    case 26:
+        kayokoSystemGestureTypeMultitasking = 0x27;
+        break;
+    default:
+        return;
+    }
+    kayokoSystemGestureTypeControlCenter = majorVersion == 26 ? 0x38 : 0x6;
+
     Class gestureManagerClass = NSClassFromString(@"SBMainDisplaySystemGestureManager");
     CHLoadClass_(&SBMainDisplaySystemGestureManager$, gestureManagerClass);
     SEL gestureAllowedSelector = @selector(_isGestureWithTypeAllowed:);

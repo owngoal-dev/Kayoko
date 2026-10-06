@@ -20,11 +20,14 @@ CHDeclareClass(UIKeyboardLayoutStar);
 
 @interface UIKeyboardDockItem : NSObject
 - (id)initWithImageName:(id)arg1 identifier:(id)arg2;
+- (id)initWithTitle:(NSString *)title image:(UIImage *)image identifier:(NSString *)identifier;
 - (UIImage *)imageWithRenderConfig:(id)arg1;
 - (void)setImageName:(NSString *)arg1;
+- (void)setTitle:(NSString *)title image:(UIImage *)image;
 @end
 
 @interface UIKeyboardDockItemButton : UIButton
+@property (retain, nonatomic) NSString *identifier;
 @end
 
 @interface UISystemKeyboardDockController : NSObject
@@ -63,6 +66,20 @@ CHOptimizedMethod1(self, void, UIKeyboardDockItem, setImageName, NSString *, arg
         }
     }
     CHSuper1(UIKeyboardDockItem, setImageName, arg1);
+}
+
+CHOptimizedMethod3(self, id, UIKeyboardDockItem, initWithTitle, NSString *, title, image, UIImage *, image, identifier, NSString *, identifier) {
+    if ([title isEqualToString:@"mic"]) {
+        image = [UIImage systemImageNamed:@"list.clipboard"];
+    }
+    return CHSuper3(UIKeyboardDockItem, initWithTitle, title, image, image, identifier, identifier);
+}
+
+CHOptimizedMethod2(self, void, UIKeyboardDockItem, setTitle, NSString *, title, image, UIImage *, image) {
+    if ([title isEqualToString:@"mic"]) {
+        image = [UIImage systemImageNamed:@"list.clipboard"];
+    }
+    CHSuper2(UIKeyboardDockItem, setTitle, title, image, image);
 }
 
 CHOptimizedMethod1(self, UIImage *, UIKeyboardDockItem, imageWithRenderConfig, id, arg1) {
@@ -123,7 +140,16 @@ CHOptimizedMethod1(self, UIImage *, UIKeyboardDockItem, imageWithRenderConfig, i
 
 CHOptimizedMethod1(self, CGRect, UIKeyboardDockItemButton, imageRectForContentRect, CGRect, arg1) {
     CGRect origRect = CHSuper1(UIKeyboardDockItemButton, imageRectForContentRect, arg1);
-    if (@available(iOS 16, *)) {
+    if (@available(iOS 17.0.1, *)) {
+        if ([self.identifier isEqualToString:@"dictation"]) {
+            CGFloat width = origRect.size.width * 1.5;
+            CGFloat height = origRect.size.height * 1.5;
+            origRect.origin.x -= (width - origRect.size.width) / 2.0;
+            origRect.origin.y -= (height - origRect.size.height) / 2.0;
+            origRect.size.width = width;
+            origRect.size.height = height;
+        }
+    } else if (@available(iOS 16, *)) {
         if (ABS(origRect.size.width - origRect.size.height) > 1.0) {
             CGSize newSize = CGSizeMake(origRect.size.width * 0.92, origRect.size.height * 0.92);
             CGPoint newOrigin = CGPointMake(origRect.origin.x + (origRect.size.width - newSize.width) / 2,
@@ -175,8 +201,13 @@ CHOptimizedMethod1(self, UIKBTree *, UIKeyboardLayoutStar, keyHitTest, CGPoint, 
       CHLoadClass_(&UIKeyboardImpl$, NSClassFromString(@"UIKeyboardImpl"));
       CHLoadClass_(&UIKeyboardLayoutStar$, NSClassFromString(@"UIKeyboardLayoutStar"));
 
-      CHHook2(UIKeyboardDockItem, initWithImageName, identifier);
-      CHHook1(UIKeyboardDockItem, setImageName);
+      if (@available(iOS 17.0.1, *)) {
+          CHHook3(UIKeyboardDockItem, initWithTitle, image, identifier);
+          CHHook2(UIKeyboardDockItem, setTitle, image);
+      } else {
+          CHHook2(UIKeyboardDockItem, initWithImageName, identifier);
+          CHHook1(UIKeyboardDockItem, setImageName);
+      }
       if (class_getInstanceMethod(dockItemClass, @selector(imageWithRenderConfig:))) {
           CHHook1(UIKeyboardDockItem, imageWithRenderConfig);
       } else {

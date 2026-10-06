@@ -10,14 +10,14 @@ This repository is the maintained Kayoko fork distributed by Lessica as `com.82f
 
 ## Installation
 
-1. Download the latest `deb` from the [releases](https://github.com/OwnGoalStudio/Kayoko/releases).
+1. Download the latest `deb` from the [releases](https://github.com/owngoal-dev/Kayoko/releases).
 2. Install the `deb` using your preferred method.
 
 This package conflicts with and replaces the original `codes.aurora.kayoko` package. During the v4 history upgrade, clipboard history from both the original `codes.aurora.kayoko` data directory and the maintained `com.82flex.kayoko` data directory is imported into the new store.
 
 ## Source Code
 
-The maintained source code is available at <https://github.com/OwnGoalStudio/Kayoko>.
+The maintained source code is available at <https://github.com/owngoal-dev/Kayoko>.
 
 The archived upstream project is available at <https://github.com/AlexandraAurora/Kayoko>.
 

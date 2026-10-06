@@ -137,7 +137,9 @@ CHOptimizedMethod1(self, void, UIKeyboardLayoutStar, setKeyplaneName, NSString *
     CHSuper1(UIKeyboardLayoutStar, setKeyplaneName, name);
 
     kayokoShouldShowCustomSuggestions = [name isEqualToString:@"numbers-and-punctuation"] ||
-                                        [name isEqualToString:@"numbers-and-punctuation-alternate"];
+                                        [name isEqualToString:@"numbers-and-punctuation-alternate"] ||
+                                        [name isEqualToString:@"first-alternate"] ||
+                                        [name isEqualToString:@"second-alternate"];
 
     if (@available(iOS 15.0, *)) {
         [[[objc_getClass("UIKeyboardImpl") activeInstance] autocorrectionController] setAutocorrectionList:nil];
