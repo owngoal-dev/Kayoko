@@ -11,6 +11,7 @@
 
 #import <CaptainHook/CaptainHook.h>
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 #import <substrate.h>
 
 static NSString *const kKayokoInputSwitcherItemIdentifier = @"com.82flex.kayoko.globe";
@@ -18,6 +19,7 @@ static NSString *const kKayokoInputSwitcherItemIdentifier = @"com.82flex.kayoko.
 CHDeclareClass(UIInputSwitcherView);
 
 @interface UIInputSwitcherView : UIView
+@property(nonatomic, readonly) BOOL isForDictation;
 @end
 
 @interface UIInputSwitcherItem : NSObject
@@ -35,7 +37,14 @@ CHDeclareClass(UIInputSwitcherView);
 
 CHOptimizedMethod0(self, void, UIInputSwitcherView, _reloadInputSwitcherItems) {
     CHSuper0(UIInputSwitcherView, _reloadInputSwitcherItems);
-    BOOL isForDictation = MSHookIvar<BOOL>(self, "m_isForDictation");
+    BOOL isForDictation;
+    if ([self respondsToSelector:@selector(isForDictation)]) {
+        isForDictation = self.isForDictation;
+    } else if (class_getInstanceVariable(object_getClass(self), "m_isForDictation")) {
+        isForDictation = MSHookIvar<BOOL>(self, "m_isForDictation");
+    } else {
+        return;
+    }
     if (isForDictation) {
         return;
     }
