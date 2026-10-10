@@ -1,13 +1,15 @@
 #!/bin/sh
+set -eu
 
-if [ -z "$THEOS_DEVICE_SIMULATOR" ]; then
-  exit 0
+if [ "${THEOS_DEVICE_SIMULATOR:-}" != 1 ]; then
+  echo "Source devkit/simulator.sh first." >&2
+  exit 1
 fi
 
-cd $(dirname $0)/.. || exit
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <device_id>" >&2
+  exit 1
+fi
 
-DEVICE_ID="6B660A64-7801-4D7B-9161-74C6737432AC"
-XCODE_PATH=$(xcode-select -p)
-
-xcrun simctl boot $DEVICE_ID
-open "$XCODE_PATH/Applications/Simulator.app"
+xcrun simctl bootstatus "$1" -b
+open "$(xcode-select -p)/Applications/Simulator.app"

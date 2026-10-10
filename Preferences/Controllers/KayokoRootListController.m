@@ -14,7 +14,7 @@
 
 #import <Preferences/PSSpecifier.h>
 #import <UIKit/UIKit.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 @interface NSConcreteNotification : NSNotification
 @end
@@ -514,7 +514,7 @@ static NSString *const kKayokoLegacyZebraBundleIdentifier = @"xyz.willy.Zebra";
 - (NSString *)kayokoUpdaterPath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray<NSString *> *candidatePaths = @[
-        jbroot(@"/usr/local/libexec/kayoko_updater"), @"/var/jb/usr/local/libexec/kayoko_updater",
+        KayokoRootPath(@"/usr/local/libexec/kayoko_updater"), @"/var/jb/usr/local/libexec/kayoko_updater",
         @"/usr/local/libexec/kayoko_updater"
     ];
 

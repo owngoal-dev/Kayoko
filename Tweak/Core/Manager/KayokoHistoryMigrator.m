@@ -7,7 +7,7 @@
 #import "KayokoHistoryStore.h"
 #import "KayokoPasteboardItem.h"
 
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 static NSString *const kKayokoMigratorHistoryKey = @"history";
 static NSString *const kKayokoMigratorFavoritesKey = @"favorites";
@@ -17,7 +17,7 @@ static NSString *KayokoHistoryMigratorLocalizedString(NSString *key) {
     static NSBundle *localizationBundle = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      localizationBundle = [NSBundle bundleWithPath:jbroot(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
+      localizationBundle = [NSBundle bundleWithPath:KayokoRootPath(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
     });
     return [localizationBundle localizedStringForKey:key value:key table:@"Tweak"] ?: key;
 }
@@ -73,11 +73,11 @@ NS_ASSUME_NONNULL_END
     return @[
         [KayokoHistoryMigrationSource
             sourceWithIdentifier:@"codes.aurora.kayoko"
-                     historyPath:jbroot(@"/var/mobile/Library/codes.aurora.kayoko/history.json")
-                      imagesPath:jbroot(@"/var/mobile/Library/codes.aurora.kayoko/images/")],
+                     historyPath:KayokoRootPath(@"/var/mobile/Library/codes.aurora.kayoko/history.json")
+                      imagesPath:KayokoRootPath(@"/var/mobile/Library/codes.aurora.kayoko/images/")],
         [KayokoHistoryMigrationSource sourceWithIdentifier:@"com.82flex.kayoko"
-                                               historyPath:jbroot(@"/var/mobile/Library/com.82flex.kayoko/history.json")
-                                                imagesPath:jbroot(@"/var/mobile/Library/com.82flex.kayoko/images/")]
+                                               historyPath:KayokoRootPath(@"/var/mobile/Library/com.82flex.kayoko/history.json")
+                                                imagesPath:KayokoRootPath(@"/var/mobile/Library/com.82flex.kayoko/images/")]
     ];
 }
 

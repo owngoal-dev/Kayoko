@@ -18,7 +18,7 @@
 #import <HBLog.h>
 #import <QuartzCore/QuartzCore.h>
 #import <notify.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 static NSTimeInterval const kKayokoMinimumFeedbackInterval = 0.6;
 static NSTimeInterval const kKayokoPasteSuppressionExpirationDelay = 1.0;
@@ -939,7 +939,7 @@ NS_ASSUME_NONNULL_END
 
     NSString *relativeSoundPath =
         [NSString stringWithFormat:@"/Library/PreferenceBundles/KayokoPreferences.bundle/%@.aiff", soundName];
-    NSString *soundPath = jbroot(relativeSoundPath);
+    NSString *soundPath = KayokoRootPath(relativeSoundPath);
     AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:soundPath]
                                                                    error:&error];
     if (error) {

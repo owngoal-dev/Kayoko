@@ -4,6 +4,7 @@
 //
 
 #import "KayokoThumbnailCache.h"
+#import "KayokoPaths.h"
 
 #import <CommonCrypto/CommonDigest.h>
 #import <ImageIO/ImageIO.h>
@@ -35,7 +36,7 @@ static NSUInteger const kKayokoThumbnailContainerPayloadLimit = 32 * 1024 * 1024
 }
 
 + (NSString *)defaultCacheDirectoryPath {
-    return kKayokoThumbnailDefaultCacheDirectoryPath;
+    return KayokoUserPath(kKayokoThumbnailDefaultCacheDirectoryPath);
 }
 
 - (instancetype)init {

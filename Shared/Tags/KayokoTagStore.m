@@ -6,7 +6,7 @@
 #import "KayokoTagStore.h"
 #import "KayokoTag.h"
 
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 NSString *const kKayokoTagStoreErrorDomain = @"com.82flex.kayoko.tag-store";
 
@@ -21,7 +21,7 @@ static NSString *const kKayokoTagStoreFileName = @"tags-v4.plist";
 @implementation KayokoTagStore
 
 + (NSString *)defaultTagsPath {
-    return [jbroot(kKayokoTagStoreDataDirectoryPath) stringByAppendingPathComponent:kKayokoTagStoreFileName];
+    return [KayokoRootPath(kKayokoTagStoreDataDirectoryPath) stringByAppendingPathComponent:kKayokoTagStoreFileName];
 }
 
 - (instancetype)initWithTagsPath:(NSString *)tagsPath localizationBundle:(NSBundle *)localizationBundle {

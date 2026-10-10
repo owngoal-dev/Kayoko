@@ -5,13 +5,13 @@
 
 #import "KayokoHelperLocalization.h"
 
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 static NSBundle *kayokoHelperLocalizationBundle(void) {
     static NSBundle *bundle = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      bundle = [NSBundle bundleWithPath:jbroot(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
+      bundle = [NSBundle bundleWithPath:KayokoRootPath(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
     });
     return bundle;
 }

@@ -11,6 +11,7 @@
 #import "KayokoSpringBoardHooks.h"
 
 #import <CoreFoundation/CoreFoundation.h>
+#import <TargetConditionals.h>
 
 typedef NS_ENUM(NSUInteger, KayokoCoreProcessKind) {
     KayokoCoreProcessKindUnsupported = 0,
@@ -49,6 +50,12 @@ typedef NS_ENUM(NSUInteger, KayokoCoreProcessKind) {
     NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
     NSString *processName = [[NSProcessInfo processInfo] processName];
     NSString *executablePath = [args firstObject];
+#if TARGET_OS_SIMULATOR
+    NSString *simulatorRoot = NSProcessInfo.processInfo.environment[@"SIMULATOR_ROOT"];
+    if (simulatorRoot.length > 0 && [executablePath hasPrefix:[simulatorRoot stringByAppendingString:@"/"]]) {
+        executablePath = [executablePath substringFromIndex:simulatorRoot.length];
+    }
+#endif
     BOOL isSystemExecutable =
         [executablePath hasPrefix:@"/System/Library/"] || [executablePath hasPrefix:@"/usr/libexec/"];
     BOOL isPasteTipProcess = [processName isEqualToString:@"druid"] || [processName isEqualToString:@"pasted"];

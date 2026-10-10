@@ -12,7 +12,7 @@
 #import "KayokoTagStore.h"
 
 #import <CoreFoundation/CoreFoundation.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 #import <unistd.h>
 
 static NSString *const kKayokoCurrentDataDirectory = @"/var/mobile/Library/com.82flex.kayoko";
@@ -20,8 +20,10 @@ static NSString *const kKayokoCopyVaultDataDirectory = @"/var/mobile/Documents/C
 static NSString *const kKayokoCopyLogDataDirectory = @"/var/mobile/Library/CopyLog";
 static NSString *const kKayokoPreferencesBundlePath = @"/Library/PreferenceBundles/KayokoPreferences.bundle";
 static NSString *const kKayokoThumbnailCacheDirectoryPath = @"/var/mobile/Library/Caches/com.82flex.kayoko/thumbnails";
+#if !TARGET_OS_SIMULATOR
 static NSUInteger const kKayokoMobileUserID = 501;
 static NSUInteger const kKayokoMobileGroupID = 501;
+#endif
 static useconds_t const kKayokoCoreMaintenanceGracePeriodMicroseconds = 500000;
 static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000;
 
@@ -127,7 +129,7 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
     KayokoTagStore *tagStore = [[KayokoTagStore alloc] initWithTagsPath:[KayokoTagStore defaultTagsPath]
                                                      localizationBundle:[self preferencesLocalizationBundle]];
     KayokoCopyVaultImporter *importer =
-        [[KayokoCopyVaultImporter alloc] initWithSourceDirectoryPath:kKayokoCopyVaultDataDirectory
+        [[KayokoCopyVaultImporter alloc] initWithSourceDirectoryPath:KayokoUserPath(kKayokoCopyVaultDataDirectory)
                                                         historyStore:store
                                                             tagStore:tagStore];
     BOOL imported = [importer runWithSkippedItemCount:skippedItemCount error:error];
@@ -157,7 +159,7 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
         return NO;
     }
 
-    NSString *sourceDirectoryPath = jbroot(kKayokoCopyLogDataDirectory);
+    NSString *sourceDirectoryPath = KayokoRootPath(kKayokoCopyLogDataDirectory);
     KayokoCopyLogImporter *importer = [[KayokoCopyLogImporter alloc] initWithSourceDirectoryPath:sourceDirectoryPath
                                                                                     historyStore:store];
     BOOL imported = [importer runWithSkippedItemCount:skippedItemCount error:error];
@@ -175,10 +177,10 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
                                          (__bridge CFStringRef)kKayokoNotificationKeyCoreResetThumbnailMemoryCache, nil,
                                          nil, YES);
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager fileExistsAtPath:kKayokoThumbnailCacheDirectoryPath]) {
+    if (![fileManager fileExistsAtPath:KayokoUserPath(kKayokoThumbnailCacheDirectoryPath)]) {
         return YES;
     }
-    return [fileManager removeItemAtPath:kKayokoThumbnailCacheDirectoryPath error:error];
+    return [fileManager removeItemAtPath:KayokoUserPath(kKayokoThumbnailCacheDirectoryPath) error:error];
 }
 
 #pragma mark - Legacy Cleanup
@@ -229,7 +231,7 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
 }
 
 - (NSString *)currentImagesPath {
-    return [jbroot(kKayokoCurrentDataDirectory) stringByAppendingPathComponent:@"images"];
+    return [KayokoRootPath(kKayokoCurrentDataDirectory) stringByAppendingPathComponent:@"images"];
 }
 
 #pragma mark - Default Tags
@@ -241,7 +243,7 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
 }
 
 - (NSBundle *)preferencesLocalizationBundle {
-    NSString *bundlePath = jbroot(kKayokoPreferencesBundlePath);
+    NSString *bundlePath = KayokoRootPath(kKayokoPreferencesBundlePath);
     NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
     return bundle ?: [NSBundle mainBundle];
 }
@@ -268,7 +270,7 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
 }
 
 - (BOOL)repairCurrentDataDirectoryOwnershipWithError:(NSError **)error {
-    NSString *dataDirectory = jbroot(kKayokoCurrentDataDirectory);
+    NSString *dataDirectory = KayokoRootPath(kKayokoCurrentDataDirectory);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:dataDirectory]) {
         return YES;
@@ -298,8 +300,10 @@ static NSInteger const kKayokoUpdaterHistoryStoreBusyTimeoutMilliseconds = 10000
                   fileManager:(NSFileManager *)fileManager
                         error:(NSError **)error {
     NSDictionary<NSFileAttributeKey, id> *attributes = @{
+#if !TARGET_OS_SIMULATOR
         NSFileOwnerAccountID : @(kKayokoMobileUserID),
         NSFileGroupOwnerAccountID : @(kKayokoMobileGroupID),
+#endif
         NSFilePosixPermissions : @(isDirectory ? 0755 : 0644)
     };
     return [fileManager setAttributes:attributes ofItemAtPath:path error:error];

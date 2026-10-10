@@ -17,13 +17,18 @@ KayokoHelper_FILES += KayokoSwipeUpHooks.m
 
 KayokoHelper_CFLAGS += -fobjc-arc
 KayokoHelper_CFLAGS += -I../../Preferences
+KayokoHelper_CFLAGS += -I../../Shared
 
 KayokoHelper_FRAMEWORKS += CoreGraphics
 KayokoHelper_FRAMEWORKS += QuartzCore
 KayokoHelper_FRAMEWORKS += UIKit
 KayokoHelper_FRAMEWORKS += AudioToolbox
 
+ifeq ($(THEOS_DEVICE_SIMULATOR),1)
+KayokoHelper_LDFLAGS += /opt/simject/CydiaSubstrate.framework/CydiaSubstrate -rpath /opt/simject -Wl,-headerpad_max_install_names
+else
 KayokoHelper_LIBRARIES += substrate
+endif
 ifeq ($(THEOS_PACKAGE_SCHEME),roothide)
 KayokoHelper_LIBRARIES += roothide
 endif

@@ -7,6 +7,7 @@
 
 #import <HBLog.h>
 #import <Security/Security.h>
+#import <TargetConditionals.h>
 #import <dlfcn.h>
 #import <sys/sysctl.h>
 
@@ -113,6 +114,12 @@ static NSString *KayokoHTTPStatusMessage(NSInteger statusCode);
 
 + (BOOL)mirrorHavocCredentialToAppleAccessGroupWithSource:(NSString *_Nullable *_Nullable)source
                                                     error:(NSError **)error {
+#if TARGET_OS_SIMULATOR
+    if (source) {
+        *source = @"simulator";
+    }
+    return YES;
+#endif
     if (source) {
         *source = nil;
     }
@@ -141,6 +148,9 @@ static NSString *KayokoHTTPStatusMessage(NSInteger statusCode);
 }
 
 + (BOOL)mirrorSileoHavocCredentialToAppleAccessGroupWithError:(NSError **)error {
+#if TARGET_OS_SIMULATOR
+    return YES;
+#endif
     KayokoHavocCredential *credential = KayokoCopySileoHavocCredential(error);
     if (!credential) {
         return NO;
@@ -152,8 +162,8 @@ static NSString *KayokoHTTPStatusMessage(NSInteger statusCode);
 #pragma mark - Authorization State
 
 + (BOOL)hasAuthorizationPassFlagWithError:(NSError **)error {
-#if DEBUG
-    HBLogDebug(@"Kayoko: Havoc authorization check for pass flag (DEBUG mode)");
+#if DEBUG || TARGET_OS_SIMULATOR
+    HBLogDebug(@"Kayoko: Havoc authorization check bypassed for debug/simulator build");
     return YES;
 #else
     NSData *flagData = KayokoCopyKeychainData(kKayokoAuthorizationFlagService, kKayokoAuthorizationFlagAccount,
@@ -163,12 +173,18 @@ static NSString *KayokoHTTPStatusMessage(NSInteger statusCode);
 }
 
 + (BOOL)setAuthorizationPassFlagWithError:(NSError **)error {
+#if TARGET_OS_SIMULATOR
+    return YES;
+#endif
     NSData *flagData = [kKayokoPurchaseAuthorizationProductIdentifier dataUsingEncoding:NSUTF8StringEncoding];
     return KayokoSaveKeychainData(flagData, kKayokoAuthorizationFlagService, kKayokoAuthorizationFlagAccount,
                                   kKayokoAppleAccessGroup, error);
 }
 
 + (BOOL)clearAuthorizationStateWithError:(NSError **)error {
+#if TARGET_OS_SIMULATOR
+    return YES;
+#endif
     if (!KayokoDeleteKeychainItems(kKayokoCredentialMirrorService, nil, kKayokoAppleAccessGroup, error)) {
         return NO;
     }
@@ -179,6 +195,13 @@ static NSString *KayokoHTTPStatusMessage(NSInteger statusCode);
 #pragma mark - Purchase Check
 
 + (void)checkMirroredPurchaseWithCompletion:(void (^)(KayokoPurchaseAuthorizationResult *result))completion {
+#if TARGET_OS_SIMULATOR
+    completion([[KayokoPurchaseAuthorizationResult alloc] initWithState:KayokoPurchaseAuthorizationStatePurchased
+                                                                 error:nil
+                                                            statusCode:200
+                                                         statusMessage:nil]);
+    return;
+#endif
     HBLogDebug(@"Kayoko: Havoc authorization check started");
 
     NSError *credentialError = nil;

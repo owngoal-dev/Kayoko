@@ -5,6 +5,7 @@
 
 #import "KayokoHelperConfiguration.h"
 #import "KayokoPreferenceKeys.h"
+#import "KayokoPaths.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,8 +27,8 @@ NS_ASSUME_NONNULL_END
 
 + (instancetype)currentConfiguration {
     NSUserDefaults *preferences = [[NSUserDefaults alloc]
-        initWithSuiteName:[NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist",
-                                                     kKayokoPreferencesIdentifier]];
+        initWithSuiteName:KayokoUserPath([NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist",
+                                                                   kKayokoPreferencesIdentifier])];
 
     [preferences registerDefaults:@{
         kKayokoPreferenceKeyEnabled : @(kKayokoPreferenceKeyEnabledDefaultValue),

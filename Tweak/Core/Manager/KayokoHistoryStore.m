@@ -10,7 +10,7 @@
 #import <ImageIO/ImageIO.h>
 #import <limits.h>
 #import <math.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 #import <sqlite3.h>
 #import <string.h>
 
@@ -26,7 +26,7 @@ static NSString *KayokoHistoryStoreLocalizedString(NSString *key) {
     static NSBundle *localizationBundle = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      localizationBundle = [NSBundle bundleWithPath:jbroot(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
+      localizationBundle = [NSBundle bundleWithPath:KayokoRootPath(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
     });
     return [localizationBundle localizedStringForKey:key value:key table:@"Tweak"] ?: key;
 }
@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_END
 #pragma mark - Paths
 
 + (NSString *)defaultDatabasePath {
-    return jbroot(@"/var/mobile/Library/com.82flex.kayoko/history-v4.sqlite");
+    return KayokoRootPath(@"/var/mobile/Library/com.82flex.kayoko/history-v4.sqlite");
 }
 
 #pragma mark - Lifecycle

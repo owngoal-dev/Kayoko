@@ -13,7 +13,7 @@
 
 #import <Preferences/PSSpecifier.h>
 #import <UIKit/UIKit.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 static NSString *const kKayokoDataDirectoryPath = @"/var/mobile/Library/com.82flex.kayoko";
 static NSString *const kKayokoCopyLogDataDirectoryPath = @"/var/mobile/Library/CopyLog";
@@ -232,7 +232,7 @@ static NSString *const kKayokoCopyVaultDataDirectoryPath = @"/var/mobile/Documen
 
 - (void)importCopyLogPrompt {
     [self presentExternalImportPromptForSourceName:kKayokoExternalImportSourceCopyLog
-                                 dataDirectoryPath:jbroot(kKayokoCopyLogDataDirectoryPath)
+                                 dataDirectoryPath:KayokoRootPath(kKayokoCopyLogDataDirectoryPath)
                                           titleKey:@"Import from CopyLog"
                                         messageKey:@"Kayoko will merge CopyLog snippets and favorite items with your "
                                                     "current data. Existing Kayoko items will be kept. SpringBoard "
@@ -243,7 +243,7 @@ static NSString *const kKayokoCopyVaultDataDirectoryPath = @"/var/mobile/Documen
 
 - (void)importCopyVaultPrompt {
     [self presentExternalImportPromptForSourceName:kKayokoExternalImportSourceCopyVault
-                                 dataDirectoryPath:kKayokoCopyVaultDataDirectoryPath
+                                 dataDirectoryPath:KayokoUserPath(kKayokoCopyVaultDataDirectoryPath)
                                           titleKey:@"Import from CopyVault"
                                         messageKey:@"Kayoko will merge CopyVault history and archived items with your "
                                                     "current data. Existing Kayoko items will be kept. SpringBoard "
@@ -361,7 +361,7 @@ static NSString *const kKayokoCopyVaultDataDirectoryPath = @"/var/mobile/Documen
 }
 
 - (NSString *)dataDirectoryPath {
-    return jbroot(kKayokoDataDirectoryPath);
+    return KayokoRootPath(kKayokoDataDirectoryPath);
 }
 
 - (NSURL *)filzaURLForDataDirectoryPath:(NSString *)dataDirectoryPath {
@@ -736,7 +736,7 @@ static NSString *const kKayokoCopyVaultDataDirectoryPath = @"/var/mobile/Documen
 - (NSString *)kayokoUpdaterPath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray<NSString *> *candidatePaths = @[
-        jbroot(@"/usr/local/libexec/kayoko_updater"), @"/var/jb/usr/local/libexec/kayoko_updater",
+        KayokoRootPath(@"/usr/local/libexec/kayoko_updater"), @"/var/jb/usr/local/libexec/kayoko_updater",
         @"/usr/local/libexec/kayoko_updater"
     ];
     for (NSString *path in candidatePaths) {

@@ -21,6 +21,8 @@ The maintained source code is available at <https://github.com/owngoal-dev/Kayok
 
 The archived upstream project is available at <https://github.com/AlexandraAurora/Kayoko>.
 
+For simulator setup and build instructions, see [Simulator Builds](docs/simulator-builds.md).
+
 ## License
 
 Kayoko is distributed under [GPLv3](COPYING). Paid distribution does not remove recipients' GPLv3 rights to copy, modify, and redistribute the software.

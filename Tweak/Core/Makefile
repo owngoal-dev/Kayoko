@@ -26,6 +26,7 @@ KayokoCore_CFLAGS += -IPresentation
 KayokoCore_CFLAGS += -IViews
 KayokoCore_CFLAGS += -I../../Shared/Tags
 KayokoCore_CFLAGS += -I../../Shared/Purchases
+KayokoCore_CFLAGS += -I../../Shared
 
 KayokoCore_FRAMEWORKS += AudioToolbox
 KayokoCore_FRAMEWORKS += AVFoundation
@@ -38,7 +39,11 @@ KayokoCore_FRAMEWORKS += UIKit
 KayokoCore_PRIVATE_FRAMEWORKS += CoreServices
 
 KayokoCore_LIBRARIES += sqlite3
+ifeq ($(THEOS_DEVICE_SIMULATOR),1)
+KayokoCore_LDFLAGS += /opt/simject/CydiaSubstrate.framework/CydiaSubstrate -rpath /opt/simject -Wl,-headerpad_max_install_names
+else
 KayokoCore_LIBRARIES += substrate
+endif
 ifeq ($(THEOS_PACKAGE_SCHEME),roothide)
 KayokoCore_LIBRARIES += roothide
 endif

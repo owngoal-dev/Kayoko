@@ -20,7 +20,7 @@
 #import <HBLog.h>
 #import <ImageIO/ImageIO.h>
 #import <math.h>
-#import <roothide.h>
+#import "KayokoPaths.h"
 
 static NSTimeInterval const kKayokoPasteboardWriteConfirmationTimeout = 0.25;
 static NSTimeInterval const kKayokoSimulatedAutomaticPasteDelay = 0.2;
@@ -159,7 +159,7 @@ NS_ASSUME_NONNULL_END
     static NSString *kayokoHistoryPath = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      kayokoHistoryPath = jbroot(@"/var/mobile/Library/com.82flex.kayoko/history.json");
+      kayokoHistoryPath = KayokoRootPath(@"/var/mobile/Library/com.82flex.kayoko/history.json");
     });
     return kayokoHistoryPath;
 }
@@ -168,7 +168,7 @@ NS_ASSUME_NONNULL_END
     static NSString *kayokoHistoryImagesPath = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      kayokoHistoryImagesPath = jbroot(@"/var/mobile/Library/com.82flex.kayoko/images/");
+      kayokoHistoryImagesPath = KayokoRootPath(@"/var/mobile/Library/com.82flex.kayoko/images/");
     });
     return kayokoHistoryImagesPath;
 }
@@ -188,7 +188,7 @@ NS_ASSUME_NONNULL_END
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
       kayokoLocalizationBundle =
-          [NSBundle bundleWithPath:jbroot(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
+          [NSBundle bundleWithPath:KayokoRootPath(@"/Library/PreferenceBundles/KayokoPreferences.bundle")];
     });
     return kayokoLocalizationBundle;
 }
@@ -235,9 +235,13 @@ NS_ASSUME_NONNULL_END
                                                       return [weakSelf limitForHistoryKey:historyKey];
                                                     }];
         _historyChangeNotifier = [[KayokoHistoryChangeNotifier alloc] init];
+#if !TARGET_OS_SIMULATOR
         if (@available(iOS 15, *)) {
             [self prepareGeneralPasteboard];
-        } else {
+        } else
+#endif
+        {
+            // Simulator pasteboard initialization can deadlock while the dylib constructor holds dyld's lock.
             dispatch_async(dispatch_get_main_queue(), ^{
               [self prepareGeneralPasteboard];
             });
